@@ -3,12 +3,19 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
 app.use(express.json({ limit: '20mb' }));
 
 // ── EMPLOYEE LOGINS — ADD/REMOVE STAFF HERE ──────────────────────────────
 const EMPLOYEES = [
-  { email: 'ccasillas@hermandadmn.com', password: 'Hermandad*1234', name: 'Carlos Casillas' },
+  { email: 'carlos@hermandad.org', password: 'password123', name: 'Carlos Casillas' },
   { email: 'employee2@hermandad.org', password: 'password456', name: 'Employee Two' },
 ];
 
@@ -47,8 +54,12 @@ app.post('/translate', async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
+    console.error('Translation error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(3000, () => console.log('HMN Translation backend running'));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log('HMN Translation backend running on port ' + PORT));
