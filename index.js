@@ -15,7 +15,7 @@ app.use(express.json({ limit: '20mb' }));
 
 // ── EMPLOYEE LOGINS — ADD/REMOVE STAFF HERE ──────────────────────────────
 const EMPLOYEES = [
-  { email: 'carlos@hermandad.org', password: 'password123', name: 'Carlos Casillas' },
+  { email: 'ccasillas@hermandadmn.com', password: 'Hermandad*1234', name: 'Carlos Casillas' },
   { email: 'employee2@hermandad.org', password: 'password456', name: 'Employee Two' },
 ];
 
