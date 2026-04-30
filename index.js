@@ -37,5 +37,6 @@ app.post('/translate', async (req, res) => {
 });
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
-
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 module.exports = app;
