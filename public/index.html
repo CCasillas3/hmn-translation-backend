@@ -6,6 +6,12 @@
 <title>Panel Interno | Hermandad Mexicana Nacional</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
+.a-check-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink-soft);transition:all 0.15s;}
+.a-check-btn:active{transform:scale(0.97);}
+.a-check-btn.selected{background:#fdf0ef;border-color:#C8102E;color:#C8102E;font-weight:500;}
+.a-check-btn.a-clean.selected{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.a-check-btn.a-other.selected{background:#fdf8e7;border-color:#B8860B;color:#B8860B;}
+
 /* ── RESET ── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:#FAFAF7;color:#1A1A18;}
@@ -492,60 +498,126 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#FAFAF7;color:
           <button class="back-btn" onclick="showScreen('dashboard')" data-es="← Inicio" data-en="← Home">← Inicio</button>
         </div>
 
-        <div class="tool-body" id="asesorInput">
+        <!-- OVERSIGHT FLAG -->
+        <div id="asesor-flag-banner" style="display:none;background:#C8102E;color:#fff;border-radius:12px;padding:16px 20px;margin-bottom:16px;border-left:5px solid #8b1a10;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;" id="asesor-flag-title">⚠️ Oversight Department Required</div>
+          <div style="font-size:12px;opacity:0.9;" id="asesor-flag-sub">601/601-A, I-212, U Visa, or VAWA — flag for special department review.</div>
+        </div>
+
+        <!-- CLIENT INFO -->
+        <div class="tool-body" style="margin-bottom:16px;">
           <div class="tool-section">
-            <div class="tool-section-label" data-es="Tipo de caso" data-en="Case type">Tipo de caso</div>
+            <div class="tool-section-label" data-es="Información del cliente" data-en="Client information">Información del cliente</div>
             <div class="form-row">
               <div class="form-group" style="margin:0;">
-                <label data-es="Categoría" data-en="Category">Categoría</label>
-                <select class="select-styled" id="caseCategory">
-                  <option value="" data-es="— Seleccionar —" data-en="— Select —">— Seleccionar —</option>
-                  <option value="citizenship" data-es="Ciudadanía (N-400)" data-en="Citizenship (N-400)">Ciudadanía (N-400)</option>
-                  <option value="green_card" data-es="Tarjeta Verde" data-en="Green Card">Tarjeta Verde</option>
-                  <option value="daca" data-en="DACA" data-es="DACA">DACA</option>
-                  <option value="renewal" data-es="Renovación de Documentos" data-en="Document Renewal">Renovación de Documentos</option>
-                  <option value="family" data-es="Petición Familiar" data-en="Family Petition">Petición Familiar</option>
-                  <option value="asylum" data-es="Asilo" data-en="Asylum">Asilo</option>
-                  <option value="other" data-es="Otro" data-en="Other">Otro</option>
-                </select>
+                <label data-es="Empleado" data-en="Staff Member">Empleado</label>
+                <input type="text" id="a-staff" placeholder="Tu nombre">
               </div>
               <div class="form-group" style="margin:0;">
-                <label data-es="Nombre del cliente" data-en="Client name">Nombre del cliente</label>
-                <input type="text" id="asesorClientName" placeholder="Nombre completo">
+                <label data-es="ID del Caso" data-en="Case ID">ID del Caso</label>
+                <input type="text" id="a-caseid" placeholder="HMN-2026-001">
               </div>
             </div>
-          </div>
-
-          <div class="tool-section">
-            <div class="tool-section-label" data-es="Situación del cliente" data-en="Client situation">Situación del cliente</div>
-            <div class="form-group" style="margin:0;">
-              <label data-es="Describe la situación, historial y preguntas del cliente" data-en="Describe the client's situation, history and questions">Describe la situación, historial y preguntas del cliente</label>
-              <textarea id="asesorNotes" rows="5" placeholder="Ej: Cliente lleva 15 años en EE.UU., tiene green card desde 2010, quiere aplicar para ciudadanía pero tiene una infracción de tráfico de 2018..."></textarea>
+            <div style="margin-top:14px;">
+              <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:7px;" data-es="Tipo de caso" data-en="Case type">Tipo de caso</label>
+              <select class="select-styled" id="a-casetype" onchange="checkAsesorOversight()">
+                <option value="">— Seleccionar —</option>
+                <optgroup label="Casos Comunes">
+                  <option>DACA / Renewal</option>
+                  <option>Citizenship / Ciudadanía</option>
+                  <option>Green Card Renewal</option>
+                  <option>Advance Parole</option>
+                  <option>Adjustment of Status</option>
+                  <option>Consular Processing</option>
+                  <option>Family Petition / Petición Familiar</option>
+                  <option>TPS</option>
+                </optgroup>
+                <optgroup label="⚠️ Oversight Required">
+                  <option>601-A (Provisional Waiver)</option>
+                  <option>601 (Unlawful Presence Waiver)</option>
+                  <option>I-212 (Permission to Reapply)</option>
+                  <option>U Visa</option>
+                  <option>VAWA</option>
+                </optgroup>
+                <optgroup label="Refer Out">
+                  <option>Asylum / Asilo</option>
+                  <option>Family Law</option>
+                  <option>Accident / Personal Injury</option>
+                </optgroup>
+                <option>Other / Otro</option>
+              </select>
             </div>
-          </div>
-
-          <div class="tool-section">
-            <div class="tool-section-label" data-es="Información adicional" data-en="Additional information">Información adicional</div>
-            <div class="form-row">
-              <div class="form-group" style="margin:0;">
-                <label data-es="País de origen" data-en="Country of origin">País de origen</label>
-                <input type="text" id="asesorCountry" placeholder="México">
-              </div>
-              <div class="form-group" style="margin:0;">
-                <label data-es="Años en EE.UU." data-en="Years in USA">Años en EE.UU.</label>
-                <input type="number" id="asesorYears" placeholder="0">
-              </div>
-            </div>
-          </div>
-
-          <div class="tool-actions">
-            <button class="btn btn-green" onclick="runAsesor()">
-              💬 <span data-es="Consultar Asesor IA" data-en="Consult AI Advisor">Consultar Asesor IA</span>
-            </button>
           </div>
         </div>
 
-        <!-- Asesor Result -->
+        <!-- IMMIGRATION HISTORY -->
+        <div class="tool-body" style="margin-bottom:16px;">
+          <div class="tool-section">
+            <div class="tool-section-label" data-es="Historial Migratorio" data-en="Immigration History">Historial Migratorio</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;" id="a-imm-factors">
+              <button type="button" class="a-check-btn a-clean" data-group="imm" data-value="no_history">✓ No immigration history</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="prior_entry">Prior entries</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="deportation">Prior deportation</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="ewi">EWI</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="visa_fraud">Visa fraud</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="overstay">Visa overstay</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="multi_deport">Multiple deportations</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="pending_case">Pending case</button>
+              <button type="button" class="a-check-btn" data-group="imm" data-value="expired_visa">Expired visa</button>
+              <button type="button" class="a-check-btn a-other" data-group="imm" data-value="other_imm" data-other="a-imm-other">Other</button>
+            </div>
+            <input type="text" id="a-imm-other" style="display:none;margin-top:10px;width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;" placeholder="Describe other immigration history...">
+          </div>
+        </div>
+
+        <!-- CRIMINAL HISTORY -->
+        <div class="tool-body" style="margin-bottom:16px;">
+          <div class="tool-section">
+            <div class="tool-section-label" data-es="Historial Criminal" data-en="Criminal History">Historial Criminal</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;" id="a-crim-factors">
+              <button type="button" class="a-check-btn a-clean" data-group="crim" data-value="no_criminal">✓ No criminal history</button>
+              <button type="button" class="a-check-btn" data-group="crim" data-value="dui">DUI</button>
+              <button type="button" class="a-check-btn" data-group="crim" data-value="dv">Domestic violence</button>
+              <button type="button" class="a-check-btn" data-group="crim" data-value="trafficking">Trafficking</button>
+              <button type="button" class="a-check-btn" data-group="crim" data-value="felony">Felony</button>
+              <button type="button" class="a-check-btn" data-group="crim" data-value="misdemeanor">Misdemeanor</button>
+              <button type="button" class="a-check-btn" data-group="crim" data-value="traffic">Traffic violations</button>
+              <button type="button" class="a-check-btn a-livescan" data-group="crim" data-value="livescan">Needs LiveScan</button>
+              <button type="button" class="a-check-btn a-other" data-group="crim" data-value="other_crim" data-other="a-crim-other">Other</button>
+            </div>
+            <input type="text" id="a-crim-other" style="display:none;margin-top:10px;width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;" placeholder="Describe other criminal history...">
+            <div id="a-livescan-note" style="display:none;margin-top:12px;background:#E8F4FD;border:1px solid #b8d8f5;border-radius:10px;padding:14px;font-size:13px;color:#1a5fa8;">
+              <strong>📍 LiveScan Referral:</strong> Refer client to <strong>10800 S Broadway Ave</strong><br>
+              <span style="font-size:12px;">CAL DOJ · FBI · OBIM · CBP · USCIS FOIA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CASE NOTES + QA -->
+        <div class="tool-body" style="margin-bottom:16px;">
+          <div class="tool-section" style="border-bottom:1px solid var(--border);">
+            <div class="tool-section-label" data-es="Notas del caso" data-en="Case Notes">Notas del caso</div>
+            <textarea id="a-notes" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;resize:vertical;min-height:100px;line-height:1.6;" placeholder="Describe la situación del cliente..."></textarea>
+          </div>
+          <div class="tool-section">
+            <div class="tool-section-label" data-es="Pregunta rápida" data-en="Quick question">Pregunta rápida</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input type="text" id="a-qa" style="flex:1;min-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;" placeholder="e.g. How much does DACA renewal cost?" onkeydown="if(event.key==='Enter')askQuickQuestion()">
+              <button class="btn btn-outline" onclick="askQuickQuestion()" style="white-space:nowrap;" data-es="Preguntar" data-en="Ask">Preguntar</button>
+            </div>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-outline" onclick="clearAsesor()" data-es="Limpiar" data-en="Clear">Limpiar</button>
+            <button class="btn btn-green" onclick="evaluateAsesorCase()">💬 <span data-es="Evaluar Caso" data-en="Evaluate Case">Evaluar Caso</span></button>
+          </div>
+        </div>
+
+        <!-- ROUTING RESULT -->
+        <div id="a-routing" style="display:none;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:13px;">
+          <div style="font-size:15px;font-weight:600;" id="a-routing-title"></div>
+        </div>
+
+        <!-- AI RESPONSE -->
         <div class="result-card hidden" id="asesorResult">
           <div class="result-header">
             <h3 data-es="Respuesta del Asesor" data-en="Advisor Response">Respuesta del Asesor</h3>
@@ -554,10 +626,50 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#FAFAF7;color:
           <div class="processing-box hidden" id="asesorLoading">
             <div class="spinner"></div>
             <h3 data-es="Consultando al Asesor..." data-en="Consulting Advisor...">Consultando al Asesor...</h3>
-            <p data-es="Analizando el caso y preparando orientación..." data-en="Analyzing the case and preparing guidance...">Analizando el caso y preparando orientación...</p>
+            <p data-es="Analizando el caso..." data-en="Analyzing the case...">Analizando el caso...</p>
           </div>
           <div id="asesorResponseBody" style="padding:24px 26px;">
             <div id="asesorResponse" style="font-size:14px;line-height:1.8;color:var(--ink-soft);white-space:pre-wrap;"></div>
+          </div>
+          <div style="padding:16px 26px;border-top:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="showScreen('dashboard')" data-es="Ver Directorio de Referencias" data-en="View Referral Directory">Ver Directorio de Referencias</button>
+            <button class="btn btn-green" onclick="logAsesorCase()" data-es="Registrar Caso" data-en="Log Case">Registrar Caso</button>
+          </div>
+        </div>
+
+        <!-- REFERRAL DIRECTORY (inside asesor) -->
+        <div class="tool-body" style="margin-top:20px;">
+          <div class="tool-section">
+            <div class="tool-section-label" data-es="Directorio de Referencias" data-en="Referral Directory">Directorio de Referencias</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="referral-grid">
+              <div style="background:var(--green-light);border:1px solid rgba(0,107,53,0.15);border-radius:10px;padding:14px;">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:4px;">Asilo / Asylum</div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Zaira Sanchez</div>
+                <div style="font-size:11px;color:var(--ink-muted);font-style:italic;">Contacto pendiente</div>
+              </div>
+              <div style="background:var(--green-light);border:1px solid rgba(0,107,53,0.15);border-radius:10px;padding:14px;">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:4px;">Family Law</div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Law Offices of Horacio Lozano</div>
+                <div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px;">Divorces · Child support</div>
+                <a href="tel:3106752995" style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;text-decoration:none;">📞 (310) 675-2995</a>
+              </div>
+              <div style="background:var(--green-light);border:1px solid rgba(0,107,53,0.15);border-radius:10px;padding:14px;">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:4px;">Accidents / Personal Injury</div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Law Offices of Jesse J. Banuelos</div>
+                <div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px;">Personal injury · Accidents</div>
+                <a href="tel:8663732827" style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;text-decoration:none;">📞 (866) 373-2827</a>
+              </div>
+              <div style="background:var(--green-light);border:1px solid rgba(0,107,53,0.15);border-radius:10px;padding:14px;">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:4px;">Higher Immigration</div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Law Offices of Jesse J. Banuelos</div>
+                <div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px;">Complex immigration cases</div>
+                <a href="tel:8663732827" style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;text-decoration:none;">📞 (866) 373-2827</a>
+              </div>
+            </div>
+            <div style="margin-top:12px;background:#E8F4FD;border:1px solid #b8d8f5;border-radius:10px;padding:14px;font-size:13px;color:#1a5fa8;">
+              <strong>📍 LiveScan Interno:</strong> 10800 S Broadway Ave<br>
+              <span style="font-size:12px;">CAL DOJ · FBI · OBIM · CBP · USCIS FOIA</span>
+            </div>
           </div>
         </div>
       </div>
@@ -967,23 +1079,101 @@ function closeSidebar() {
 }
 
 // ── ASESOR ────────────────────────────────────────────
-async function runAsesor() {
-  const category = document.getElementById('caseCategory').value;
-  const clientName = document.getElementById('asesorClientName').value;
-  const notes = document.getElementById('asesorNotes').value;
-  const country = document.getElementById('asesorCountry').value;
-  const years = document.getElementById('asesorYears').value;
-  if(!notes.trim()){alert(lang==='es'?'Por favor describe la situación del cliente.':'Please describe the client situation.');return;}
+const OVERSIGHT_TYPES = ['601-A (Provisional Waiver)','601 (Unlawful Presence Waiver)','I-212 (Permission to Reapply)','U Visa','VAWA'];
+const REFER_OUT_TYPES = ['Asylum / Asilo','Family Law','Accident / Personal Injury'];
+const HMN_SYSTEM = `You are an internal immigration case assistant for Hermandad Mexicana Nacional (HMN), a nonprofit immigration consulting organization in Los Angeles, CA.
+STRICT RULES:
+1. Only answer based on HMN procedures and established immigration law.
+2. If the answer is not in established law, say: "I don't have that on file. Please consult a supervisor or attorney."
+3. You are NOT a lawyer. Complex cases require attorney review.
+4. Never make definitive legal conclusions — provide guidance and flag for human review.
+5. Respond in the same language the staff member uses (English or Spanish).
+6. For oversight cases (601, 601-A, I-212, U Visa, VAWA) always remind staff this requires special department review.
+7. For criminal history, recommend LiveScan at 10800 S Broadway Ave when appropriate.
+8. Never speculate or invent case outcomes.
+9. Keep responses practical, concise, and actionable.
+10. Referrals: Family Law → Horacio Lozano (310) 675-2995 | Accidents/Higher Immigration → Jesse J. Banuelos (866) 373-2827 | Asylum → Zaira Sanchez (contact pending).`;
+
+// Check button logic
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.a-check-btn');
+  if(!btn) return;
+  const group = btn.dataset.group;
+  const isClean = btn.classList.contains('a-clean');
+  const isOther = btn.classList.contains('a-other');
+  const otherId = btn.dataset.other;
+  const groupEl = document.getElementById('a-'+group+'-factors');
+
+  if(isClean) {
+    groupEl.querySelectorAll('.a-check-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const otherInp = document.getElementById(group==='imm'?'a-imm-other':'a-crim-other');
+    if(otherInp) otherInp.style.display='none';
+    if(group==='crim') document.getElementById('a-livescan-note').style.display='none';
+  } else {
+    groupEl.querySelector('.a-clean')?.classList.remove('selected');
+    btn.classList.toggle('selected');
+    if(btn.dataset.value==='livescan') {
+      document.getElementById('a-livescan-note').style.display=btn.classList.contains('selected')?'block':'none';
+    }
+    if(isOther && otherId) {
+      document.getElementById(otherId).style.display=btn.classList.contains('selected')?'block':'none';
+    }
+  }
+});
+
+function checkAsesorOversight() {
+  const ct = document.getElementById('a-casetype').value;
+  const isOversight = OVERSIGHT_TYPES.includes(ct);
+  const banner = document.getElementById('asesor-flag-banner');
+  banner.style.display = isOversight ? 'block' : 'none';
+}
+
+function getAsesorSelected(group) {
+  return Array.from(document.querySelectorAll(`#a-${group}-factors .a-check-btn.selected`)).map(b=>b.dataset.value);
+}
+
+async function evaluateAsesorCase() {
+  const caseType = document.getElementById('a-casetype').value;
+  const notes = document.getElementById('a-notes').value;
+  const immFactors = getAsesorSelected('imm');
+  const crimFactors = getAsesorSelected('crim');
+  const immOther = document.getElementById('a-imm-other').value;
+  const crimOther = document.getElementById('a-crim-other').value;
+  const isOversight = OVERSIGHT_TYPES.includes(caseType);
+  const isReferOut = REFER_OUT_TYPES.includes(caseType);
+
+  if(!caseType){alert(lang==='es'?'Por favor selecciona el tipo de caso.':'Please select a case type.');return;}
+
+  const routingBox = document.getElementById('a-routing');
   document.getElementById('asesorResult').classList.remove('hidden');
   document.getElementById('asesorLoading').classList.remove('hidden');
   document.getElementById('asesorResponseBody').classList.add('hidden');
-  document.getElementById('asesorInput').style.opacity='0.5';
-  const systemPrompt = `You are an expert immigration consultant assistant for Hermandad Mexicana Nacional, a nonprofit immigration services organization. You help staff consultants during client appointments. Provide clear, practical guidance in ${lang==='es'?'Spanish':'English'}. Be thorough but concise. Structure your response with clear sections: eligibility assessment, required documents, process steps, timeline, and important notes/warnings. Always recommend consulting an immigration attorney for complex cases.`;
-  const userMsg = `Case type: ${category}\nClient name: ${clientName}\nCountry of origin: ${country}\nYears in USA: ${years}\n\nClient situation:\n${notes}`;
+  routingBox.style.display='block';
+
+  let routing = 'office';
+  if(isOversight) routing='oversight';
+  else if(isReferOut||crimFactors.includes('felony')||crimFactors.includes('trafficking')||immFactors.includes('multi_deport')) routing='escalate';
+
+  const routingStyles = {
+    office:{bg:'var(--green-light)',border:'rgba(0,107,53,0.2)',color:'var(--green)',title:lang==='es'?'✅ Manejar en la Oficina':'✅ Handle at Office Level'},
+    escalate:{bg:'#fdf8e7',border:'#f0d070',color:'#B8860B',title:lang==='es'?'⚠️ Revisión Requerida':'⚠️ Review Required — Case by Case'},
+    oversight:{bg:'#fdf0ef',border:'#f5b8b4',color:'#C8102E',title:lang==='es'?'🔴 Supervisión Requerida':'🔴 Oversight Department Required'}
+  };
+  const rs = routingStyles[routing];
+  routingBox.style.cssText=`display:block;background:${rs.bg};border:1px solid ${rs.border};color:${rs.color};border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:13px;`;
+  document.getElementById('a-routing-title').textContent = rs.title;
+  document.getElementById('a-routing-title').style.color = rs.color;
+
+  const immDesc = immFactors.includes('no_history')?'No immigration history':[...immFactors,immOther?'Other: '+immOther:''].filter(Boolean).join(', ')||'Not specified';
+  const crimDesc = crimFactors.includes('no_criminal')?'No criminal history':[...crimFactors,crimOther?'Other: '+crimOther:''].filter(Boolean).join(', ')||'Not specified';
+  const langStr = lang==='es'?'Spanish':'English';
+  const prompt = `Respond in ${langStr}. Case: ${caseType} | Immigration: ${immDesc} | Criminal: ${crimDesc} | Notes: ${notes||'None'} ${isOversight?'| OVERSIGHT required.':''} ${isReferOut?'| REFER OUT.':''} Provide: 1. Assessment. 2. Key considerations. 3. Next steps. 4. Warnings. Keep it practical and under 250 words.`;
+
   try {
     const res = await fetch(BACKEND_URL+'/translate',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({system:systemPrompt,messages:[{role:'user',content:userMsg}]})
+      body:JSON.stringify({system:HMN_SYSTEM,messages:[{role:'user',content:prompt}]})
     });
     const data = await res.json();
     const text = data.content.map(c=>c.text||'').join('');
@@ -991,20 +1181,60 @@ async function runAsesor() {
     document.getElementById('asesorLoading').classList.add('hidden');
     document.getElementById('asesorResponseBody').classList.remove('hidden');
   } catch(e) {
-    document.getElementById('asesorResponse').textContent = lang==='es'?'Error al conectar con el asesor. Por favor intenta de nuevo.':'Error connecting to advisor. Please try again.';
+    document.getElementById('asesorResponse').textContent = lang==='es'?'Error al conectar. Intenta de nuevo.':'Connection error. Please try again.';
     document.getElementById('asesorLoading').classList.add('hidden');
     document.getElementById('asesorResponseBody').classList.remove('hidden');
   }
-  document.getElementById('asesorInput').style.opacity='1';
+}
+
+async function askQuickQuestion() {
+  const q = document.getElementById('a-qa').value.trim();
+  if(!q) return;
+  document.getElementById('asesorResult').classList.remove('hidden');
+  document.getElementById('asesorLoading').classList.remove('hidden');
+  document.getElementById('asesorResponseBody').classList.add('hidden');
+  const langStr = lang==='es'?'Spanish':'English';
+  try {
+    const res = await fetch(BACKEND_URL+'/translate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:HMN_SYSTEM,messages:[{role:'user',content:`Respond in ${langStr}. Staff question: ${q}. Answer based on HMN procedures and immigration law. Under 150 words.`}]})
+    });
+    const data = await res.json();
+    const text = data.content.map(c=>c.text||'').join('');
+    document.getElementById('asesorResponse').textContent = text;
+    document.getElementById('asesorLoading').classList.add('hidden');
+    document.getElementById('asesorResponseBody').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('asesorResponse').textContent = 'Error: '+e.message;
+    document.getElementById('asesorLoading').classList.add('hidden');
+    document.getElementById('asesorResponseBody').classList.remove('hidden');
+  }
+}
+
+function logAsesorCase() {
+  const id = document.getElementById('a-caseid').value||'HMN-'+Date.now().toString().slice(-4);
+  const ct = document.getElementById('a-casetype').value||'—';
+  const staff = document.getElementById('a-staff').value||currentEmployee?.name||'—';
+  alert((lang==='es'?'Caso registrado: ':'Case logged: ')+id+' — '+ct+' — '+staff);
 }
 
 function resetAsesor() {
   document.getElementById('asesorResult').classList.add('hidden');
-  document.getElementById('caseCategory').value='';
-  document.getElementById('asesorClientName').value='';
-  document.getElementById('asesorNotes').value='';
-  document.getElementById('asesorCountry').value='';
-  document.getElementById('asesorYears').value='';
+  document.getElementById('a-routing').style.display='none';
+  document.getElementById('a-casetype').value='';
+  document.getElementById('a-notes').value='';
+  document.getElementById('a-qa').value='';
+  document.getElementById('a-imm-other').style.display='none';
+  document.getElementById('a-crim-other').style.display='none';
+  document.getElementById('a-livescan-note').style.display='none';
+  document.getElementById('asesor-flag-banner').style.display='none';
+  document.querySelectorAll('.a-check-btn').forEach(b=>b.classList.remove('selected'));
+}
+
+function clearAsesor() {
+  resetAsesor();
+  document.getElementById('a-staff').value='';
+  document.getElementById('a-caseid').value='';
 }
 
 // ── TRADUCCIONES ──────────────────────────────────────
